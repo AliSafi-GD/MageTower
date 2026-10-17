@@ -1,12 +1,12 @@
 # Story 002: Endless waves and bosses
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -76,3 +76,12 @@
 
 - Depends on: Story 001
 - Unlocks: 003, 006
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-17
+**Criteria**: 7/7 checked; 4 are code-only (HP/damage scaling formula, count growth and cap, boss HP multiplier, determinism) and the inter-wave delay itself was not measured. Wave counter, wave progression and the boss look were OBSERVED.
+**Deviations**: None blocking. Advisory items logged as TD-008, TD-009 and a note on TD-003. Balance note: the tower falls at wave 5 (first boss) with no upgrades; retune after Story 003.
+**Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: `production/qa/evidence/waves-and-bosses/` (fix-t2.png wave 1 HUD, fix-t90.png wave 5 with purple boss and tower 29/100, fix-t100.png tower destroyed).
+**Code Review**: Skipped — Solo mode (unity-specialist review was run; 6 of 8 findings fixed)

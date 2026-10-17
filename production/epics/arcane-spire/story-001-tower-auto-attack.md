@@ -1,12 +1,12 @@
 # Story 001: Tower and mage auto-attack
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Visual/Feel
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -77,3 +77,12 @@
 
 - Depends on: None
 - Unlocks: 002
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-17
+**Criteria**: 8/8 checked, 1 not observed (AC-7 idle/resume: code only, needs playtest) and the *feel* of combat DEFERRED to `/team-qa` (a still cannot show timing or weight)
+**Deviations**: Advisory only, logged as TD-001..TD-007 in `docs/tech-debt-register.md` (presentation constants in code, legacy Text/TextMesh, effect pooling, `Resources.Load`, editor menu folder + no .asmdef, unverified WebGPU doc line, AC-7 untested). Out-of-scope files: `Assets/Scripts/ScreenshotOnArg.cs` and `Assets/Scripts/HeadlessCapture.cs` (test tooling, not gameplay).
+**Test Evidence**: Visual/Feel: `production/qa/evidence/tower-auto-attack-evidence.md` (sign-off approved) + 5 retained screenshots in `production/qa/evidence/tower-auto-attack/`. Logic tests waived at `qa.level: minimal`.
+**Code Review**: Skipped — Solo mode (an engine-specialist review by `unity-specialist` was run; 5 of 11 findings fixed)

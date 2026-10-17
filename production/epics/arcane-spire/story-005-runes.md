@@ -1,12 +1,12 @@
 # Story 005: Runes
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -76,3 +76,12 @@
 
 - Depends on: Story 003
 - Unlocks: None
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-17
+**Criteria**: 7/7 checked. OBSERVED: three runes with locked/unlocked/equipped states, slot limit (2/2), "(no free slot)" state, immediate stat effect (damage 28 -> 34 with Might equipped). Code-only, confirmed by unity-specialist review: exact restore on unequip (recompute from scratch, order-independent), additive-within-type/multiplicative-across-types stacking, runes persisting across waves. DEFERRED: mouse clicks and keys 8/9/0 never exercised (headless has no input).
+**Deviations**: None blocking. Orchestrator requested a MEDIUM fix mid-story: added `CombatStats`, a single shared stat-modifier layer (shop + runes, extensible for Story 006), replacing five separate multiplication sites. Advisory items logged as TD-017..TD-019.
+**Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: `production/qa/evidence/runes/` (fix-1024x768.png, runes-t60.png, fix-autobuy-t300.png).
+**Code Review**: Skipped — Solo mode (unity-specialist review run; 1 Medium + 4 Low fixed, 3 Low deferred)

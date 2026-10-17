@@ -1,12 +1,12 @@
 # Story 003: Gold and upgrade shop
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -77,3 +77,12 @@
 
 - Depends on: Story 002
 - Unlocks: 004, 005, 006, 007
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-17
+**Criteria**: 8/8 checked. DEFERRED: mouse clicks and keys 1-4 were never exercised (headless player has no input; autobuy goes through the same ShopModel.TryBuy). Shop UI, gold HUD, disabled-button state, levels, costs and upgrade effects were OBSERVED.
+**Deviations**: None blocking. Orchestrator tuned `_goldPerKill` 5 -> 10 and `_upgradeCostGrowth` 1.35 -> 1.25 in CombatConfig.asset after the untuned run died at wave 7 even with autobuy; with the new values autobuy reached wave 13 in 300 s. Extra files: `Assets/Scripts/Combat/DevAutoBuy.cs` (test hook, active only with `--autobuy`). Advisory items logged as TD-010..TD-012.
+**Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: 10 captures in `production/qa/evidence/gold-and-shop/` (fix-1280x720.png, fix-1024x768.png, tuned-autobuy-t300.png ...).
+**Code Review**: Skipped — Solo mode (unity-specialist review run; 11 of 15 findings fixed)

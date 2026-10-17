@@ -1,12 +1,12 @@
 # Story 004: Auto-cast spells
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -76,3 +76,12 @@
 
 - Depends on: Story 003
 - Unlocks: None
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-17
+**Criteria**: 7/7 checked. OBSERVED: all three spell effects in one frame (`all-three-spells.png`), locked/unlocked states, cooldown bars, slowed tint, chain between two enemies. Code-only: slow expiry restoring speed, lightning never hitting the same enemy twice (confirmed by unity-specialist review). DEFERRED: mouse clicks and keys 5-7 never exercised (headless has no input).
+**Deviations**: None blocking. Orchestrator tuned `_fireballRadius` 2.5 -> 3.2 and `_lightningJumpRange` 3 -> 3.6 per review M1 (enemies ~3 units apart, spells mostly hit one target). Extra: `HeadlessCapture.cs` gained `--count/--interval` burst mode; `DevAutoBuy.cs` gained `--autobuy-spells-first`. Advisory items logged as TD-013..TD-016.
+**Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: `production/qa/evidence/spells/` (note: the capture tool draws world sprites over the shop panel because it moves the overlay canvas to camera space; capture artifact only).
+**Code Review**: Skipped — Solo mode (unity-specialist review run; first attempt hit an API rate limit, second completed; M1 applied, L1-L6 deferred)

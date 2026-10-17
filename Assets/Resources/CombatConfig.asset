@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39e7b2f501dc91e4898a30c5c9b88e6b, type: 3}
+  m_Name: CombatConfig
+  m_EditorClassIdentifier: Assembly-CSharp::ArcaneSpire.Combat.CombatConfig
+  _mageDamage: 10
+  _mageAttacksPerSecond: 1.5
+  _mageRange: 7.5
+  _maxAttacksPerSecond: 20
+  _towerMaxHp: 100
+  _enemyMaxHp: 30
+  _enemyMoveSpeed: 1.5
+  _enemyContactDamage: 10
+  _enemySpawnInterval: 2
+  _enemyHpGrowthPerWave: 0.12
+  _enemyDamageGrowthPerWave: 0.06
+  _baseEnemyCount: 3
+  _enemyCountGrowthPerWave: 0.75
+  _maxEnemyCount: 30
+  _bossEveryNWaves: 5
+  _bossHpMultiplier: 5
+  _bossSizeMultiplier: 1.7
+  _bossColor: {r: 0.45, g: 0.1, b: 0.6, a: 1}
+  _interWaveDelay: 3
+  _goldPerKill: 10
+  _goldGrowthPerWave: 0.08
+  _bossGoldMultiplier: 10
+  _damageBaseCost: 25
+  _attackSpeedBaseCost: 30
+  _towerHpBaseCost: 20
+  _critChanceBaseCost: 40
+  _upgradeCostGrowth: 1.25
+  _damageBonusPerLevel: 0.25
+  _attackSpeedBonusPerLevel: 0.12
+  _towerHpPerLevel: 20
+  _baseCritChance: 0
+  _critChancePerLevel: 0.03
+  _maxCritChance: 0.75
+  _critDamageMultiplier: 2
+  _critNumberColor: {r: 1, g: 0.5, b: 0.1, a: 1}
+  _critNumberScale: 1.5
+  _groundY: -3
+  _cameraOrthoSize: 5
+  _towerWidth: 1.6
+  _towerHeight: 3.5
+  _mageSize: 0.9
+  _enemySize: 0.9
+  _towerMarginFromScreenEdge: 1.5
+  _spawnMarginOffScreen: 1.5
+  _damageNumberLifetime: 0.8
+  _damageNumberRiseSpeed: 1.6
+  _damageNumberCharacterSize: 0.12
+  _damageNumberColor: {r: 1, g: 0.9, b: 0.2, a: 1}
+  _hitFlashDuration: 0.12
+  _hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  _hitPunchScale: 0.3
+  _hitBurstLifetime: 0.2
+  _hitBurstSize: 0.9
+  _attackPunchDuration: 0.12
+  _attackPunchScale: 0.25
+  _boltLifetime: 0.08
+  _boltThickness: 0.08
+  _boltColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  _fireballDamage: 20
+  _fireballCooldown: 6
+  _fireballUnlockCost: 60
+  _fireballRadius: 3.2
+  _frostDamage: 5
+  _frostCooldown: 8
+  _frostUnlockCost: 80
+  _frostRadius: 3.5
+  _frostSlowFraction: 0.5
+  _frostSlowDuration: 3
+  _lightningDamage: 15
+  _lightningCooldown: 5
+  _lightningUnlockCost: 100
+  _lightningMaxTargets: 4
+  _lightningJumpRange: 3.6
+  _spellEffectLifetime: 0.35
+  _lightningThickness: 0.15
+  _fireballColor: {r: 1, g: 0.5, b: 0.1, a: 0.6}
+  _frostColor: {r: 0.55, g: 0.85, b: 1, a: 0.9}
+  _lightningColor: {r: 1, g: 0.95, b: 0.2, a: 1}
+  _frostTintColor: {r: 0.3, g: 0.55, b: 1, a: 0.65}
+  _runeSlotCount: 2
+  _minCooldownMultiplier: 0.2
+  _mightUnlockCost: 90
+  _mightModifier: 0
+  _mightValue: 0.25
+  _greedUnlockCost: 70
+  _greedModifier: 1
+  _greedValue: 0.25
+  _hasteUnlockCost: 110
+  _hasteModifier: 2
+  _hasteValue: 0.2
