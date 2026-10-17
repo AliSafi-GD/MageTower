@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Engine Version** | Unity 6.3 LTS |
-| **Installed at pin time** | NOT DETERMINED — `/setup-engine` §3 probes the installed editor and records the result here. |
+| **Installed at pin time** | 6000.3.22f1 (editor found at `C:/Program Files/Unity/Hub/Editor/6000.3.22f1/` — matches the pinned 6.3 LTS) |
 | **Release Date** | December 2025 |
 | **Project Pinned** | 2026-02-13 |
 | **Last Docs Verified** | 2026-02-13 |
