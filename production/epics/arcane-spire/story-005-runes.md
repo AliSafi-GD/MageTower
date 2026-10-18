@@ -85,3 +85,12 @@
 **Deviations**: None blocking. Orchestrator requested a MEDIUM fix mid-story: added `CombatStats`, a single shared stat-modifier layer (shop + runes, extensible for Story 006), replacing five separate multiplication sites. Advisory items logged as TD-017..TD-019.
 **Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: `production/qa/evidence/runes/` (fix-1024x768.png, runes-t60.png, fix-autobuy-t300.png).
 **Code Review**: Skipped — Solo mode (unity-specialist review run; 1 Medium + 4 Low fixed, 3 Low deferred)
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-18
+**Criteria**: 7/7 checked. OBSERVED: three runes with effects, unlock/equip/"no free slot" states, Slots 2/2, Might damage 34 = 27.5 x 1.25 (`fix-autobuy-t300.png`), panel layout at 16:9 and 4:3. Code-only: additive-within-type / multiplicative-across-types stacking (`RuneEffects.Combine`), exact restore on unequip (`RuneBook.Recompute` from scratch, confirmed bit-for-bit by unity-specialist review), persistence across waves. DEFERRED: mouse clicks and keys 8/9/0 never exercised (headless has no input).
+**Deviations**: None blocking. Added `CombatStats.cs` (single stat-modifier layer, review MEDIUM-1) which now serves shop, runes and spells. Gold unlock only (run currency does not exist until Story 006). Advisory items logged as TD-017..TD-019.
+**Test Evidence**: Logic tests waived at `qa.level: minimal`. Run result OBSERVED: `production/qa/evidence/runes/`.
+**Code Review**: Skipped — Solo mode (unity-specialist review run; MEDIUM-1 and LOW-3/4/5/7 fixed, LOW-1/2/6 deferred)
