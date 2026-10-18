@@ -14,13 +14,16 @@ namespace ArcaneSpire.Combat
         public readonly Tower Tower;
         /// <summary>This run's wave state, read for the run-summary screen.</summary>
         public readonly WaveModel Waves;
+        /// <summary>This run's rune book, read at run end to record the last rune loadout (Story 007).</summary>
+        public readonly RuneBook Runes;
 
         /// <summary>Creates the handle set.</summary>
-        public RunHandles(Transform root, Tower tower, WaveModel waves)
+        public RunHandles(Transform root, Tower tower, WaveModel waves, RuneBook runes = null)
         {
             Root = root;
             Tower = tower;
             Waves = waves;
+            Runes = runes;
         }
     }
 }

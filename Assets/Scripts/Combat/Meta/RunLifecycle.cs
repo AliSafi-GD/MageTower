@@ -28,6 +28,7 @@ namespace ArcaneSpire.Combat
         private double _currencyEarnedThisRun;
         private int _bestWaveAtRunStart;
         private bool _runOver;
+        private SaveSystem _save;
 
         private GameObject _summaryGo;
         private GameObject _skillTreeGo;
@@ -72,6 +73,19 @@ namespace ArcaneSpire.Combat
             _skillTreeView.OnClose += CloseSkillTree;
             _skillTreeGo.SetActive(false);
 
+            // Story 007: restore the saved meta state (and credit offline progress) BEFORE the first run is built,
+            // so restored skills and the best-wave record apply to it from the first frame.
+            // Never allowed to stop the first run from starting: any unexpected failure leaves a fresh meta state.
+            try
+            {
+                _save = gameObject.AddComponent<SaveSystem>();
+                _save.Initialize(config, _meta, font);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("RunLifecycle: save system failed to initialise, continuing without load: " + e);
+            }
+
             StartNewRun();
         }
 
@@ -110,6 +124,15 @@ namespace ArcaneSpire.Combat
             _meta.RecordWave(LastWaveReached); // normally already recorded on OnWaveChanged
             bool isNewBest = LastWaveReached > _bestWaveAtRunStart;
 
+            // Story 007: remember the loadout (stored in the save, NOT applied to the next run) and save now,
+            // since the wave record and run currency just changed.
+            var loadout = new System.Collections.Generic.List<RuneType>();
+            if (_current.Runes != null)
+                for (int i = 0; i < RuneBook.RuneCount; i++)
+                    if (_current.Runes.IsEquipped((RuneType)i)) loadout.Add((RuneType)i);
+            _meta.SetLastRuneLoadout(loadout);
+            _save?.Save();
+
             _skillTreeGo.SetActive(false);
             _summaryView.Show(LastWaveReached, _meta.BestWave, isNewBest, _currencyEarnedThisRun, _meta.Wallet.Amount);
             _summaryGo.SetActive(true);
@@ -141,6 +164,7 @@ namespace ArcaneSpire.Combat
 
         private void Update()
         {
+            if (ModalGate.IsOpen) return;
             Keyboard kb = Keyboard.current;
             if (kb == null || !kb[Key.K].wasPressedThisFrame) return;
             if (_skillTreeGo.activeSelf) CloseSkillTree();

@@ -119,6 +119,7 @@ namespace ArcaneSpire.Combat
 
         private void Update()
         {
+            if (ModalGate.IsOpen) return;
             Keyboard kb = Keyboard.current;
             if (kb == null) return;
             if (kb[Key.T].wasPressedThisFrame) OnOpenSkillTree?.Invoke();

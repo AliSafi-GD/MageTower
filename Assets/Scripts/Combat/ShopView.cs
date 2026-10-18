@@ -151,7 +151,7 @@ namespace ArcaneSpire.Combat
 
         private void Update()
         {
-            if (_locked) return;
+            if (_locked || ModalGate.IsOpen) return;
             Keyboard kb = Keyboard.current;
             if (kb == null) return;
             for (int i = 0; i < Hotkeys.Length && i < ShopModel.UpgradeCount; i++)

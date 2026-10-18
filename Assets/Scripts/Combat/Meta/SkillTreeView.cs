@@ -161,6 +161,7 @@ namespace ArcaneSpire.Combat
 
         private void Update()
         {
+            if (ModalGate.IsOpen) return;
             Keyboard kb = Keyboard.current;
             if (kb == null) return;
             if (_runOver)

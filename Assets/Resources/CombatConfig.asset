@@ -117,3 +117,9 @@ MonoBehaviour:
   _goldenTouchGoldBonus: 0.2
   _towerBastionCost: 90
   _towerBastionHpBonus: 50
+  _autosaveIntervalSeconds: 30
+  _offlineMaxHours: 8
+  _offlineMinAwaySeconds: 60
+  _offlineKillsPerHour: 300
+  _offlineEfficiency: 0.25
+  _offlineWaveFraction: 0.6

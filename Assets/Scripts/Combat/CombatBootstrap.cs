@@ -172,7 +172,7 @@ namespace ArcaneSpire.Combat
                     skillTree, metaWallet, DevAutoBuy.WantsMeta(args), lifecycle,
                     Mathf.Max(0, DevAutoBuy.MaxRuns(args)), DevAutoBuy.HoldsSummary(args));
 
-            return new RunHandles(root, tower, waves);
+            return new RunHandles(root, tower, waves, runes);
         }
 
         private static GameObject CreateSprite(Transform parent, string name, Sprite sprite, Color color,

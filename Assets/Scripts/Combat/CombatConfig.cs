@@ -153,6 +153,20 @@ namespace ArcaneSpire.Combat
         [Tooltip("Tower Bastion: permanent flat tower max HP per level, applied at run start.")]
         [SerializeField, Min(0f)] private float _towerBastionHpBonus = 50f;
 
+        [Header("Save and offline progress (design/game-brief.md MVP feature 7)")]
+        [Tooltip("Seconds between unconditional autosaves (also refreshes the last-session timestamp).")]
+        [SerializeField, Min(1f)] private float _autosaveIntervalSeconds = 30f;
+        [Tooltip("Offline gains are capped at this many hours away.")]
+        [SerializeField, Range(0f, 72f)] private float _offlineMaxHours = 8f;
+        [Tooltip("Shorter absences than this (seconds) give no offline gain and no welcome-back popup.")]
+        [SerializeField, Min(0f)] private float _offlineMinAwaySeconds = 60f;
+        [Tooltip("Estimated kills per hour while away, before the efficiency factor.")]
+        [SerializeField, Min(0f)] private float _offlineKillsPerHour = 300f;
+        [Tooltip("Fraction of those kills that count (0.25 = a quarter of an attentive player).")]
+        [SerializeField, Range(0f, 1f)] private float _offlineEfficiency = 0.25f;
+        [Tooltip("The wave farmed offline = best wave x this fraction (at least wave 1).")]
+        [SerializeField, Range(0.05f, 1f)] private float _offlineWaveFraction = 0.6f;
+
         [Header("Layout (world units)")]
         [SerializeField] private float _groundY = -3f;
         [SerializeField, Min(1f)] private float _cameraOrthoSize = 5f;
@@ -386,6 +400,19 @@ namespace ArcaneSpire.Combat
         public float RunCurrencyGrowthPerWave => Mathf.Max(0f, _runCurrencyGrowthPerWave);
         /// <summary>Boss kill run-currency multiple.</summary>
         public float RunCurrencyBossMultiplier => Mathf.Max(1f, _runCurrencyBossMultiplier);
+
+        /// <summary>Seconds between unconditional autosaves (at least 1).</summary>
+        public float AutosaveIntervalSeconds => Mathf.Max(1f, _autosaveIntervalSeconds);
+        /// <summary>Offline-gain cap in hours (0..72).</summary>
+        public float OfflineMaxHours => Mathf.Clamp(_offlineMaxHours, 0f, 72f);
+        /// <summary>Minimum absence in seconds for offline gains and the popup.</summary>
+        public float OfflineMinAwaySeconds => Mathf.Max(0f, _offlineMinAwaySeconds);
+        /// <summary>Estimated kills per hour while away (before efficiency).</summary>
+        public float OfflineKillsPerHour => Mathf.Max(0f, _offlineKillsPerHour);
+        /// <summary>Fraction of estimated kills that count (0..1).</summary>
+        public float OfflineEfficiency => Mathf.Clamp01(_offlineEfficiency);
+        /// <summary>Offline wave = best wave x this fraction (0.05..1).</summary>
+        public float OfflineWaveFraction => Mathf.Clamp(_offlineWaveFraction, 0.05f, 1f);
 
         /// <summary>Maximum level of every skill node.</summary>
         public int SkillMaxLevel => Mathf.Clamp(_skillMaxLevel, 1, 20);

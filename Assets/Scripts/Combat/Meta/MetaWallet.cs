@@ -16,12 +16,24 @@ namespace ArcaneSpire.Combat
         /// <summary>Current run currency.</summary>
         public double Amount { get; private set; }
 
-        /// <summary>Adds currency; non-positive or non-finite amounts are ignored.</summary>
+        /// <summary>Adds currency; non-positive or non-finite amounts are ignored. The balance saturates at double.MaxValue.</summary>
         public void Add(double amount)
         {
             if (!(amount > 0.0) || double.IsInfinity(amount)) return;
-            Amount += amount;
+            Amount = Math.Min(double.MaxValue, Amount + amount); // overflow gives +Infinity; never store it
             OnCurrencyChanged?.Invoke(Amount);
+        }
+
+        /// <summary>
+        /// Story 007 restore: replaces the balance with a loaded value. Negative or non-finite values are rejected
+        /// (returns false, balance unchanged). Raises <see cref="OnCurrencyChanged"/> so views refresh.
+        /// </summary>
+        public bool Set(double amount)
+        {
+            if (double.IsNaN(amount) || double.IsInfinity(amount) || amount < 0.0) return false;
+            Amount = amount;
+            OnCurrencyChanged?.Invoke(Amount);
+            return true;
         }
 
         /// <summary>True if the balance covers the cost.</summary>

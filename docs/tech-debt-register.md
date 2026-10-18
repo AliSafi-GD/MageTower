@@ -1,6 +1,6 @@
 ## Technical Debt Register
 Last updated: 2026-10-17
-Total items: 22 | Estimated total effort: 21S + 1M
+Total items: 26 | Estimated total effort: 24S + 1M + 1L
 
 | ID | Category | Description | Files | Effort | Impact | Priority | Status | Added | Sprint |
 |----|----------|-------------|-------|--------|--------|----------|--------|-------|--------|
@@ -29,3 +29,7 @@ Total items: 22 | Estimated total effort: 21S + 1M
 | TD-020 | Test | Skill tree, run summary and run-restart buttons/keys (T, N, K, Q/W/E/R/F) never exercised with real input; needs a manual playtest or an Input System test fixture — from production/epics/arcane-spire/story-006-run-end-and-meta.md | Assets/Scripts/Combat/Meta/SkillTreeView.cs, RunSummaryView.cs | S | Med | — | Open | 2026-10-18 | Backlog |
 | TD-021 | Performance | Damage numbers, bolts and spell effects are created at the scene root, so they outlive a run teardown by under 1 s (harmless, self-destroying); parent them under the run root with the TD-003 pooling work — from story-006 | Assets/Scripts/Combat/CombatFeedback.cs, Spells/SpellEffects.cs | S | Low | — | Open | 2026-10-18 | Backlog |
 | TD-022 | Architecture | MetaProgress has no restore API for SkillTree/MetaWallet/BestWave; Story 007 must add save/load (the object is already separate from run state) — from story-006 | Assets/Scripts/Combat/Meta/MetaProgress.cs, SkillTree.cs, MetaWallet.cs | S | Med | — | Open | 2026-10-18 | Story 007 |
+| TD-023 | Architecture | WebGL save is not triggered by closing the browser tab (Application.quitting and OnApplicationPause do not reliably fire there); losing up to 30 s of progress. Add a .jslib plugin listening to visibilitychange/pagehide that calls SaveNow via SendMessage; verify in a real WebGL build — from production/epics/arcane-spire/story-007-save-and-offline.md | Assets/Scripts/Combat/Meta/SaveSystem.cs | M | Med | — | Open | 2026-10-18 | Backlog |
+| TD-024 | Test | Never exercised with a real run: corrupt-save fallback and .corrupt backup, focus-return offline credit, Continue button / C / Escape, JsonUtility double/long round-trip (add an EditMode test for 9007199254740991.0 and DateTime.UtcNow.Ticks), MetaSaveMapper, OfflineProgress and option parsing are plain C# and easy to test — from story-007 | Assets/Scripts/Combat/Meta/SaveSystem.cs, MetaSaveData.cs, OfflineProgress.cs | M | Med | — | Open | 2026-10-18 | Backlog |
+| TD-025 | Architecture | Rune loadout is saved (MetaProgress.LastRuneLoadout) but never applied; either make rune unlocks permanent meta progression or drop the field. Only one .corrupt backup is kept and a save from a newer version is treated as corrupt — from story-007 | Assets/Scripts/Combat/Meta/MetaProgress.cs, SaveSystem.cs | S | Low | — | Open | 2026-10-18 | Backlog |
+| TD-026 | Architecture | Project has runInBackground: 0, so an idle game freezes in a background tab (and offline credit relies on the focus-return path); decide whether to enable it for WebGL and standalone — from story-007 | ProjectSettings/ProjectSettings.asset | S | Med | — | Open | 2026-10-18 | Backlog |

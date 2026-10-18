@@ -57,14 +57,14 @@ public class HeadlessCapture : MonoBehaviour
         int count = int.TryParse(Arg("--count"), out var c) ? Mathf.Max(1, c) : 1;
         float interval = float.TryParse(Arg("--interval"), NumberStyles.Float, CultureInfo.InvariantCulture, out var iv) ? Mathf.Max(0f, iv) : 0.1f;
 
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSecondsRealtime(seconds);
 
         var path = Arg("--headless-capture");
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         var image = new Texture2D(width, height, TextureFormat.RGB24, false);
         for (int i = 0; i < count; i++)
         {
-            if (i > 0 && interval > 0f) yield return new WaitForSeconds(interval);
+            if (i > 0 && interval > 0f) yield return new WaitForSecondsRealtime(interval);
             yield return new WaitForEndOfFrame();
             Capture(cam, image, width, height);
             var file = count == 1

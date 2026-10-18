@@ -77,6 +77,24 @@ namespace ArcaneSpire.Combat
             return true;
         }
 
+        /// <summary>
+        /// Story 007 restore: sets every node's level at once (indexed by <see cref="SkillNodeType"/>). Rejects the
+        /// whole array (returns false, nothing changed) if its length is not <see cref="NodeCount"/> or any level is
+        /// outside 0..<see cref="MaxLevel"/>. Raises <see cref="OnChanged"/> (not <see cref="OnPurchased"/>) on success.
+        /// </summary>
+        public bool SetLevels(int[] levels)
+        {
+            if (levels == null || levels.Length != NodeCount) return false;
+            for (int i = 0; i < levels.Length; i++)
+                if (levels[i] < 0 || levels[i] > _maxLevel) return false;
+            Array.Copy(levels, _levels, NodeCount);
+            OnChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Copies every node's current level (indexed by <see cref="SkillNodeType"/>).</summary>
+        public int[] GetLevels() => (int[])_levels.Clone();
+
         /// <inheritdoc />
         public float DamageMultiplier => 1f + TotalValue(SkillNodeType.ArcanePower);
         /// <inheritdoc />
