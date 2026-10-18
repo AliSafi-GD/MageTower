@@ -38,8 +38,8 @@ naming:
   scenes: PascalCase
 
 commands:
-  # TODO: build — WebGL has no direct player-build flag; write an -executeMethod build script, then set via /settings
-  build: "[TO BE CONFIGURED]"
+  # WebGL build via Assets/Editor/WebGLBuild.cs (gzip + decompression fallback for GitHub Pages); deploy with tools/deploy-gh-pages.sh
+  build: '"C:/Program Files/Unity/Hub/Editor/6000.3.22f1/Editor/Unity.exe" -batchmode -quit -projectPath . -buildTarget WebGL -executeMethod ArcaneSpire.EditorTools.WebGLBuild.Build -logFile -'
   test: '"C:/Program Files/Unity/Hub/Editor/6000.3.22f1/Editor/Unity.exe" -batchmode -runTests -projectPath . -testPlatform EditMode -testResults test-results/editmode.xml'
   # TODO: run — launches a built player; set once a build command exists (see .claude/docs/run-and-observe.md)
   run: "[TO BE CONFIGURED]"
