@@ -102,3 +102,18 @@ MonoBehaviour:
   _hasteUnlockCost: 110
   _hasteModifier: 2
   _hasteValue: 0.2
+  _runCurrencyPerKill: 4
+  _runCurrencyGrowthPerWave: 0.05
+  _runCurrencyBossMultiplier: 8
+  _skillMaxLevel: 5
+  _skillCostGrowth: 1.6
+  _arcanePowerCost: 40
+  _arcanePowerDamageBonus: 0.15
+  _swiftHandsCost: 60
+  _swiftHandsAttackSpeedBonus: 0.15
+  _quickRecoveryCost: 70
+  _quickRecoveryCooldownReduction: 0.1
+  _goldenTouchCost: 50
+  _goldenTouchGoldBonus: 0.2
+  _towerBastionCost: 90
+  _towerBastionHpBonus: 50

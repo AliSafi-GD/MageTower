@@ -37,6 +37,21 @@ namespace ArcaneSpire.Combat
             return isBoss ? Math.Round(gold * c.BossGoldMultiplier) : gold;
         }
 
+        /// <summary>
+        /// Permanent run currency for a kill (Story 006, design/game-brief.md MVP feature 6): round(runCurrencyPerKill
+        /// * (1 + growth)^(wave-1)) (at least 1 if runCurrencyPerKill &gt; 0), times the boss multiple for bosses.
+        /// Mirrors <see cref="KillGold"/> exactly but reads the separate run-currency config fields, so the meta
+        /// economy can be tuned independently of the in-run gold economy.
+        /// </summary>
+        public static double RunCurrencyReward(CombatConfig c, int wave, bool isBoss)
+        {
+            if (c.RunCurrencyPerKill <= 0f) return 0.0;
+            double growth = Math.Pow(1.0 + (double)c.RunCurrencyGrowthPerWave, Math.Max(1, wave) - 1);
+            double amount = Math.Max(1.0, Math.Round((double)c.RunCurrencyPerKill * growth));
+            if (double.IsInfinity(amount)) amount = double.MaxValue;
+            return isBoss ? Math.Round(amount * c.RunCurrencyBossMultiplier) : amount;
+        }
+
         private static float Cap(float value) => Math.Min(value, MaxStatValue);
 
         /// <summary>Enemies in the wave (boss included): base + floor((wave-1)*growth), capped at the max.</summary>

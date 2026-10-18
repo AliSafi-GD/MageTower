@@ -1,6 +1,6 @@
 ## Technical Debt Register
 Last updated: 2026-10-17
-Total items: 19 | Estimated total effort: 18S + 1M
+Total items: 22 | Estimated total effort: 21S + 1M
 
 | ID | Category | Description | Files | Effort | Impact | Priority | Status | Added | Sprint |
 |----|----------|-------------|-------|--------|--------|----------|--------|-------|--------|
@@ -26,3 +26,6 @@ Total items: 19 | Estimated total effort: 18S + 1M
 | TD-017 | Code Quality | SpellBook.ClampRemainingToCooldown only caps a running cooldown and AttackCooldown.SetAttacksPerSecond keeps the old wait, so equipping Haste does not rescale in-flight timers; rescale by new/old cooldown for spells, and make both behave the same — from production/epics/arcane-spire/story-005-runes.md | Assets/Scripts/Combat/Spells/SpellBook.cs, AttackCooldown.cs | S | Low | — | Open | 2026-10-18 | Backlog |
 | TD-018 | Code Quality | SpellHudView indexes a Names[] table without a bounds check (same pattern RuneView/ShopView now guard); use one shared display-name table — from story-005 (extends TD-016) | Assets/Scripts/Combat/Spells/SpellHudView.cs | S | Low | — | Open | 2026-10-18 | Backlog |
 | TD-019 | Test | Rune stacking (additive within type, multiplicative across), exact restore on unequip, slot limit and no second charge on repeat unlock have no EditMode tests; RuneBook/RuneEffects/CombatStats are plain C# and easy to test — from story-005 | Assets/Scripts/Combat/Runes/RuneBook.cs, RuneEffects.cs, CombatStats.cs | S | Med | — | Open | 2026-10-18 | Backlog |
+| TD-020 | Test | Skill tree, run summary and run-restart buttons/keys (T, N, K, Q/W/E/R/F) never exercised with real input; needs a manual playtest or an Input System test fixture — from production/epics/arcane-spire/story-006-run-end-and-meta.md | Assets/Scripts/Combat/Meta/SkillTreeView.cs, RunSummaryView.cs | S | Med | — | Open | 2026-10-18 | Backlog |
+| TD-021 | Performance | Damage numbers, bolts and spell effects are created at the scene root, so they outlive a run teardown by under 1 s (harmless, self-destroying); parent them under the run root with the TD-003 pooling work — from story-006 | Assets/Scripts/Combat/CombatFeedback.cs, Spells/SpellEffects.cs | S | Low | — | Open | 2026-10-18 | Backlog |
+| TD-022 | Architecture | MetaProgress has no restore API for SkillTree/MetaWallet/BestWave; Story 007 must add save/load (the object is already separate from run state) — from story-006 | Assets/Scripts/Combat/Meta/MetaProgress.cs, SkillTree.cs, MetaWallet.cs | S | Med | — | Open | 2026-10-18 | Story 007 |

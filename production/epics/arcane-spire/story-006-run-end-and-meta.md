@@ -1,12 +1,12 @@
 # Story 006: Run end and permanent upgrades
 
 > **Epic**: arcane-spire
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Integration
 > **Estimate**: fill before starting
 > **Manifest Version**: N/A (minimal — no control manifest)
-> **Last Updated**: set by /dev-story when implementation begins
+> **Last Updated**: 2026-10-17
 
 ## Context
 
@@ -75,3 +75,12 @@
 
 - Depends on: Stories 002, 003
 - Unlocks: 007
+
+---
+
+## Completion Notes
+**Completed**: 2026-10-18
+**Criteria**: 7/7 checked, all OBSERVED in window-free runs (`production/qa/evidence/run-end-and-meta/`): RUN OVER summary with NEW BEST highlight, 5-node levelled skill tree (Arcane Power Lv 1/5), run 2 reset to wave 1 with Best 5 and shop Lv 0, permanent damage bonus applied in run 2 (12 = 10 x 1.15), three consecutive runs in one process. DEFERRED: mouse clicks and keys T/N/K/Q/W/E/R/F never exercised (headless has no input).
+**Deviations**: None blocking. Story work was begun by an earlier session (7 files in `Assets/Scripts/Combat/Meta/` + edits) and audited, fixed (enemies leaked across runs, tree not reachable mid-run) and finished here. Orchestrator tuned `_runCurrencyPerKill` 1 -> 4 (run 1 earned 11 vs cheapest node 40). Skill nodes made levelled (max 5, cost x1.6). Mid-run tree (K) is view-only by design; purchases only between runs. Extra files: `HeadlessCapture.cs` now routes inactive canvases; `DevAutoBuy` gained `--autobuy-no-shop`, `--autoruns N`, `--autoruns-hold-summary`, `--autoruns-show-tree`. Advisory items logged as TD-020..TD-022.
+**Test Evidence**: Integration tests waived at `qa.level: minimal`. Run result OBSERVED: see evidence folder; earlier invalid summary captures kept under `stale/`.
+**Code Review**: Skipped — Solo mode (unity-specialist review run; fixes 2-7 and 9 applied)

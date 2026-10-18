@@ -1,11 +1,15 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace ArcaneSpire.Combat
 {
     /// <summary>
-    /// Builds the Story 001 combat scene at runtime inside the main scene
-    /// (camera, ground, tower, mage, spawner, HUD) so no scene YAML needs hand-editing.
+    /// Builds the combat scene at runtime inside the main scene (camera, ground, tower, mage, spawner, HUD) so no
+    /// scene YAML needs hand-editing. <see cref="Build"/> runs once per play session and creates the persistent
+    /// <see cref="RunLifecycle"/> (Story 006: owns the permanent <see cref="MetaWallet"/>/<see cref="SkillTree"/>
+    /// and the run-summary/skill-tree screens); <see cref="BuildRun"/> is what actually builds one run's hierarchy,
+    /// called by <see cref="RunLifecycle"/> once at startup and again every time a new run starts.
     /// </summary>
     public static class CombatBootstrap
     {
@@ -22,12 +26,34 @@ namespace ArcaneSpire.Combat
             if (SceneManager.GetActiveScene().name != TargetSceneName) return;
 
             CombatConfig config = CombatConfig.Load();
+            var metaGo = new GameObject("MetaRoot");
+            metaGo.AddComponent<RunLifecycle>().Initialize(config);
+        }
+
+        /// <summary>
+        /// Builds one run's combat hierarchy (camera reused if present, ground/tower/mage/spawner/shop/spells/runes/HUD
+        /// created fresh) under a new root parented to <paramref name="parent"/>. <paramref name="meta"/> is the
+        /// persistent Story 006 meta state (same instance across every call): its best wave seeds the new
+        /// <see cref="WaveModel"/>, and the run pushes wave progress and kill currency into it (the meta object never
+        /// subscribes to anything in the run). <paramref name="art"/> is the shared sprite set, created once per session.
+        /// <paramref name="onCurrencyEarned"/> is invoked with each kill's run-currency reward (for the run summary);
+        /// <paramref name="lifecycle"/> is handed to the dev-only autobuy hook so <c>--autoruns</c> /
+        /// <c>--autobuy-meta</c> can read results and start the next run itself. Returns the handles <see cref="RunLifecycle"/> needs to detect the run's end and
+        /// tear it down before the next call.
+        /// </summary>
+        public static RunHandles BuildRun(Transform parent, CombatConfig config, MetaProgress meta, RunArt art,
+            Action<double> onCurrencyEarned, RunLifecycle lifecycle)
+        {
             var root = new GameObject(RootName).transform;
-            Sprite square = PlaceholderArt.CreateSquare();
-            Sprite circle = PlaceholderArt.CreateCircle();
+            root.SetParent(parent, false);
+            MetaWallet metaWallet = meta?.Wallet;
+            SkillTree skillTree = meta?.Tree;
+            if (art == null) art = RunArt.Create();
+            Sprite square = art.Square;
+            Sprite circle = art.Circle;
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-            // Camera (side-view orthographic)
+            // Camera (side-view orthographic). Not parented under root: it must survive a run rebuild.
             Camera cam = Camera.main;
             if (cam == null)
             {
@@ -48,6 +74,9 @@ namespace ArcaneSpire.Combat
                 Vector3.zero, new Vector3(config.TowerWidth, config.TowerHeight, 1f), 1);
             var tower = towerGo.AddComponent<Tower>();
             tower.Initialize(config, 0f);
+            // Story 006 permanent upgrade: flat HP, applied directly (like the shop's Tower HP upgrade) from the
+            // first frame of the run, before anything can damage the tower.
+            if (skillTree != null && skillTree.TowerHpBonus > 0f) tower.AddMaxHp(skillTree.TowerHpBonus);
 
             // Mage (on top of tower)
             GameObject mageGo = CreateSprite(root, "Mage", square, new Color(0.55f, 0.25f, 0.8f),
@@ -58,7 +87,9 @@ namespace ArcaneSpire.Combat
             var spawnerGo = new GameObject("EnemySpawner");
             spawnerGo.transform.SetParent(root, false);
             var spawner = spawnerGo.AddComponent<EnemySpawner>();
-            var waves = new WaveModel();
+            var waves = new WaveModel(meta != null ? meta.BestWave : 0);
+            // Best wave is recorded into the meta object as soon as it is reached (run -> meta push; dies with the run).
+            if (meta != null) waves.OnWaveChanged += (current, best) => meta.RecordWave(current);
             spawner.Initialize(config, tower, waves, circle, new Color(0.8f, 0.2f, 0.2f), 0f);
 
             // Screen-edge layout (recomputed on resolution change)
@@ -80,12 +111,23 @@ namespace ArcaneSpire.Combat
                 (type, level) => type == UpgradeType.CritChance &&
                     UpgradeEffects.IsCritMaxed(config.BaseCritChance, config.CritChancePerLevel, level, config.MaxCritChance),
                 spellBook, type => config.SpellUnlockCost(type));
-            // Single stat-modifier layer (shop + runes; Story 006 can AddSource) used by every stat read below.
+            // Single stat-modifier layer (shop + runes; Story 006 adds the permanent skill tree) used by every stat
+            // read below. SkillTree implements IStatModifierSource directly, so this one AddSource call is all that
+            // is needed for every owned node except Tower Bastion (applied above) to take effect immediately.
             stats = config.BuildStats(shop, runes);
+            if (skillTree != null) stats.AddSource(skillTree);
             mage.Initialize(config, spawner.Enemies, shop, stats: stats);
 
-            // Only kills award gold (enemies that reach the tower raise OnRemoved but not OnEnemyKilled).
-            spawner.OnEnemyKilled += enemy => wallet.Add(stats.ApplyGold(enemy.GoldReward));
+            // Only kills award gold/run-currency (enemies that reach the tower raise OnRemoved but not OnEnemyKilled).
+            spawner.OnEnemyKilled += enemy =>
+            {
+                wallet.Add(stats.ApplyGold(enemy.GoldReward));
+                if (metaWallet != null && enemy.MetaReward > 0.0)
+                {
+                    metaWallet.Add(enemy.MetaReward);
+                    onCurrencyEarned?.Invoke(enemy.MetaReward);
+                }
+            };
             // Tower HP upgrade: raise max HP and heal by the added amount, immediately.
             shop.OnPurchased += (type, level) =>
             {
@@ -98,11 +140,11 @@ namespace ArcaneSpire.Combat
             mage.OnAttackFired += feedback.ShowBolt;
 
             // Spells (Story 004): auto-cast once unlocked in the shop.
-            var spellEffects = new SpellEffects(config, square, circle, PlaceholderArt.CreateRing());
+            var spellEffects = new SpellEffects(config, square, circle, art.Ring);
             var caster = mageGo.AddComponent<SpellCaster>();
             caster.Initialize(config, mage, spawner.Enemies, shop, spellBook, spellEffects, stats);
 
-            // Stop combat when the tower falls (run-end flow belongs to a later story).
+            // Stop combat when the tower falls (the run-end/meta flow is RunLifecycle's job, wired by the caller).
             tower.OnDestroyed += () =>
             {
                 spawner.enabled = false;
@@ -123,10 +165,14 @@ namespace ArcaneSpire.Combat
             tower.OnDestroyed += () => runeView.SetLocked(true);
 
             // Dev-only test hook: does nothing unless launched with --autobuy.
-            if (DevAutoBuy.IsRequested(System.Environment.GetCommandLineArgs(), out float autoBuyInterval))
+            string[] args = Environment.GetCommandLineArgs();
+            if (DevAutoBuy.IsRequested(args, out float autoBuyInterval))
                 hudGo.AddComponent<DevAutoBuy>().Initialize(shop, tower, autoBuyInterval,
-                    DevAutoBuy.PrefersSpells(System.Environment.GetCommandLineArgs()),
-                    runes, DevAutoBuy.PrefersRunes(System.Environment.GetCommandLineArgs()));
+                    DevAutoBuy.PrefersSpells(args), runes, DevAutoBuy.PrefersRunes(args),
+                    skillTree, metaWallet, DevAutoBuy.WantsMeta(args), lifecycle,
+                    Mathf.Max(0, DevAutoBuy.MaxRuns(args)), DevAutoBuy.HoldsSummary(args));
+
+            return new RunHandles(root, tower, waves);
         }
 
         private static GameObject CreateSprite(Transform parent, string name, Sprite sprite, Color color,

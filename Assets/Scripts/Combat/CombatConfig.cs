@@ -121,6 +121,38 @@ namespace ArcaneSpire.Combat
         [SerializeField] private RuneModifierType _hasteModifier = RuneModifierType.Cooldown;
         [SerializeField, Range(0f, 0.9f)] private float _hasteValue = 0.2f;
 
+        [Header("Meta progression / permanent skill tree (design/game-brief.md MVP feature 6)")]
+        [Tooltip("Run currency for a wave-1 regular kill.")]
+        [SerializeField, Min(0f)] private float _runCurrencyPerKill = 1f;
+        [Tooltip("Run currency per kill multiplies by (1 + rate) per wave after wave 1 (slower than gold's growth on purpose).")]
+        [SerializeField, Min(0f)] private float _runCurrencyGrowthPerWave = 0.05f;
+        [Tooltip("Boss kills award this multiple of the regular kill run currency.")]
+        [SerializeField, Min(1f)] private float _runCurrencyBossMultiplier = 8f;
+        [Tooltip("Maximum level of every skill node.")]
+        [SerializeField, Range(1, 20)] private int _skillMaxLevel = 5;
+        [Tooltip("Each skill level costs this multiple of the previous level (round(baseCost * growth^level)).")]
+        [SerializeField, Range(1f, 5f)] private float _skillCostGrowth = 1.6f;
+        [Tooltip("Arcane Power: run-currency cost of the first level (later levels scale by the cost growth).")]
+        [SerializeField, Min(1f)] private float _arcanePowerCost = 40f;
+        [Tooltip("Arcane Power: permanent +damage fraction per level (0.15 = +15%).")]
+        [SerializeField, Range(0f, 2f)] private float _arcanePowerDamageBonus = 0.15f;
+        [Tooltip("Swift Hands: run-currency cost of the first level.")]
+        [SerializeField, Min(1f)] private float _swiftHandsCost = 60f;
+        [Tooltip("Swift Hands: permanent +attack speed fraction per level.")]
+        [SerializeField, Range(0f, 2f)] private float _swiftHandsAttackSpeedBonus = 0.15f;
+        [Tooltip("Quick Recovery: run-currency cost of the first level.")]
+        [SerializeField, Min(1f)] private float _quickRecoveryCost = 70f;
+        [Tooltip("Quick Recovery: permanent cooldown reduction fraction per level (spells and basic attack interval; total floored by the min cooldown multiplier).")]
+        [SerializeField, Range(0f, 0.9f)] private float _quickRecoveryCooldownReduction = 0.10f;
+        [Tooltip("Golden Touch: run-currency cost of the first level.")]
+        [SerializeField, Min(1f)] private float _goldenTouchCost = 50f;
+        [Tooltip("Golden Touch: permanent +kill gold fraction per level.")]
+        [SerializeField, Range(0f, 2f)] private float _goldenTouchGoldBonus = 0.20f;
+        [Tooltip("Tower Bastion: run-currency cost of the first level.")]
+        [SerializeField, Min(1f)] private float _towerBastionCost = 90f;
+        [Tooltip("Tower Bastion: permanent flat tower max HP per level, applied at run start.")]
+        [SerializeField, Min(0f)] private float _towerBastionHpBonus = 50f;
+
         [Header("Layout (world units)")]
         [SerializeField] private float _groundY = -3f;
         [SerializeField, Min(1f)] private float _cameraOrthoSize = 5f;
@@ -347,6 +379,54 @@ namespace ArcaneSpire.Combat
         public CombatStats BuildStats(ShopModel shop, RuneBook runes) =>
             new CombatStats(shop, runes, DamageBonusPerLevel, AttackSpeedBonusPerLevel, MaxAttacksPerSecond,
                 MinCooldownMultiplier, SpellCooldown);
+
+        /// <summary>Run currency for a wave-1 regular kill.</summary>
+        public float RunCurrencyPerKill => Mathf.Max(0f, _runCurrencyPerKill);
+        /// <summary>Per-wave fractional growth of run currency per kill.</summary>
+        public float RunCurrencyGrowthPerWave => Mathf.Max(0f, _runCurrencyGrowthPerWave);
+        /// <summary>Boss kill run-currency multiple.</summary>
+        public float RunCurrencyBossMultiplier => Mathf.Max(1f, _runCurrencyBossMultiplier);
+
+        /// <summary>Maximum level of every skill node.</summary>
+        public int SkillMaxLevel => Mathf.Clamp(_skillMaxLevel, 1, 20);
+        /// <summary>Per-level cost growth factor of skill nodes.</summary>
+        public float SkillCostGrowth => Mathf.Clamp(_skillCostGrowth, 1f, 5f);
+
+        /// <summary>Currency cost of the skill node's first level.</summary>
+        public double SkillNodeCost(SkillNodeType type)
+        {
+            switch (type)
+            {
+                case SkillNodeType.ArcanePower: return Mathf.Max(1f, _arcanePowerCost);
+                case SkillNodeType.SwiftHands: return Mathf.Max(1f, _swiftHandsCost);
+                case SkillNodeType.QuickRecovery: return Mathf.Max(1f, _quickRecoveryCost);
+                case SkillNodeType.GoldenTouch: return Mathf.Max(1f, _goldenTouchCost);
+                default: return Mathf.Max(1f, _towerBastionCost);
+            }
+        }
+        /// <summary>Effect value of one level of the skill node (see <see cref="SkillNodeDef.Value"/>).</summary>
+        public float SkillNodeValue(SkillNodeType type)
+        {
+            switch (type)
+            {
+                case SkillNodeType.ArcanePower: return Mathf.Max(0f, _arcanePowerDamageBonus);
+                case SkillNodeType.SwiftHands: return Mathf.Max(0f, _swiftHandsAttackSpeedBonus);
+                case SkillNodeType.QuickRecovery: return Mathf.Clamp(_quickRecoveryCooldownReduction, 0f, 0.9f);
+                case SkillNodeType.GoldenTouch: return Mathf.Max(0f, _goldenTouchGoldBonus);
+                default: return Mathf.Max(0f, _towerBastionHpBonus);
+            }
+        }
+        /// <summary>Builds the per-node definitions (indexed by <see cref="SkillNodeType"/>) for a <see cref="SkillTree"/>.</summary>
+        public SkillNodeDef[] BuildSkillNodeDefs()
+        {
+            var defs = new SkillNodeDef[SkillTree.NodeCount];
+            for (int i = 0; i < defs.Length; i++)
+            {
+                var t = (SkillNodeType)i;
+                defs[i] = new SkillNodeDef(SkillNodeCost(t), SkillNodeValue(t));
+            }
+            return defs;
+        }
 
         /// <summary>Main visual colour of the spell (also its HUD bar colour).</summary>
         public Color SpellColor(SpellType type)

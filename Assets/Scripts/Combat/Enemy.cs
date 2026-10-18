@@ -43,6 +43,9 @@ namespace ArcaneSpire.Combat
         /// <summary>Gold awarded to the player if this enemy is killed (set by the spawner).</summary>
         public double GoldReward { get; set; }
 
+        /// <summary>Permanent run currency awarded if this enemy is killed (set by the spawner). Story 006.</summary>
+        public double MetaReward { get; set; }
+
         /// <summary>Sets up per-instance stats (from <see cref="WaveScaling"/>) and body size.</summary>
         public void Initialize(CombatConfig config, Tower tower, float hp, float contactDamage, float size, bool isBoss)
         {

@@ -51,15 +51,7 @@ public class HeadlessCapture : MonoBehaviour
         _target = new RenderTexture(width, height, 24);
         cam.targetTexture = _target;
 
-        // Screen-space overlay canvases draw to the screen, never into a camera target.
-        // Route them through the camera so the HUD appears in the capture.
-        foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsSortMode.None))
-        {
-            if (!canvas.isRootCanvas || canvas.renderMode != RenderMode.ScreenSpaceOverlay) continue;
-            canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            canvas.worldCamera = cam;
-            canvas.planeDistance = cam.nearClipPlane + 1f;
-        }
+        RouteOverlayCanvases(cam);
 
         // Optional burst: --count N frames, --interval seconds apart; files get _00, _01, ... suffixes.
         int count = int.TryParse(Arg("--count"), out var c) ? Mathf.Max(1, c) : 1;
@@ -84,8 +76,24 @@ public class HeadlessCapture : MonoBehaviour
         Application.Quit(0);
     }
 
+    // Screen-space overlay canvases draw to the screen, never into a camera target.
+    // Route them through the camera so the HUD appears in the capture. Includes inactive
+    // canvases and runs before every frame, so panels shown later (or rebuilt runs) are captured too.
+    static void RouteOverlayCanvases(Camera cam)
+    {
+        foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (!canvas.isRootCanvas || canvas.renderMode != RenderMode.ScreenSpaceOverlay) continue;
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = cam;
+            canvas.planeDistance = cam.nearClipPlane + 1f;
+        }
+    }
+
     void Capture(Camera cam, Texture2D image, int width, int height)
     {
+        RouteOverlayCanvases(cam);
+        Canvas.ForceUpdateCanvases();
         // A -batchmode player skips camera rendering in its loop, so render this frame explicitly.
         var request = new UniversalRenderPipeline.SingleCameraRequest { destination = _target };
         if (RenderPipeline.SupportsRenderRequest(cam, request))

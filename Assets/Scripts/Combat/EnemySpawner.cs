@@ -86,6 +86,7 @@ namespace ArcaneSpire.Combat
             float hp = boss ? WaveScaling.BossHp(_config, wave) : WaveScaling.EnemyHp(_config, wave);
 
             var go = new GameObject(boss ? "Boss" : "Enemy");
+            go.transform.SetParent(transform, false); // torn down with the run (Story 006)
             go.transform.position = new Vector3(_spawnX, _config.GroundY + size * 0.5f, 0f);
             go.transform.localScale = Vector3.one * size;
             var sr = go.AddComponent<SpriteRenderer>();
@@ -95,6 +96,7 @@ namespace ArcaneSpire.Combat
             var enemy = go.AddComponent<Enemy>();
             enemy.Initialize(_config, _tower, hp, WaveScaling.EnemyContactDamage(_config, wave), size, boss);
             enemy.GoldReward = WaveScaling.KillGold(_config, wave, boss);
+            enemy.MetaReward = WaveScaling.RunCurrencyReward(_config, wave, boss);
             enemy.OnDamaged += HandleDamaged;
             enemy.OnKilled += HandleKilled;
             enemy.OnRemoved += HandleRemoved;
